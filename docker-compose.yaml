@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  nginx:
+    restart: always
+    build: nginx/
+    ports:
+      - 80:80
+      - 8443:443
+    depends_on:
+      - uwsgi-svc
+    volumes:
+      - static:/code/static
+
+
+  uwsgi-svc:
+    restart: always
+    build: . 
+    command: "bash -c 'sleep 10; python manage.py migrate; python manage.py createsuperuser --noinput; python manage.py collectstatic --no-input; uwsgi --ini /code/uwsgi.ini'"
+    environment:
+      DEBUG: "${DEBUG}"
+      FORCE_SECURE: "${FORCE_SECURE}"
+      SECRET_KEY: "${SECRET_KEY}"
+      SQL_DATABASE: "${SQL_DATABASE}"
+      SQL_USER: "${SQL_USER}"
+      SQL_PASSWORD: "${SQL_PASSWORD}"
+      SQL_HOST: database
+      TZ: "${TZ}"
+      CELERY_BROKER_URL: "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/"
+      DJANGO_SUPERUSER_PASSWORD: "${DJANGO_SUPERUSER_PASSWORD}"
+      DJANGO_SUPERUSER_USERNAME: "${DJANGO_SUPERUSER_USERNAME}"
+      DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
+    volumes:
+      #  - /run/mysqld/mysqld.sock:/run/mysqld/mysqld.sock (Use me for system sql)
+      - static:/code/static
+
+    depends_on:
+      - database
+      - rabbitmq
+
+  wheretf-worker:
+    restart: always
+    build: . 
+    command: celery -A wheretf worker -l info --pool=gevent --concurrency 100 -Q sync
+    environment:
+      DEBUG: "${DEBUG}"
+      FORCE_SECURE: "${FORCE_SECURE}" 
+      SECRET_KEY: "${SECRET_KEY}"
+      SQL_DATABASE: "${SQL_DATABASE}"
+      SQL_USER: "${SQL_USER}"
+      SQL_PASSWORD: "${SQL_PASSWORD}"
+      SQL_HOST: "${SQL_HOST}"
+      TZ: "${TZ}"
+      CELERY_BROKER_URL: "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/"
+    depends_on:
+      - database
+      - rabbitmq
+
+  wheretf-beat:
+    restart: always
+    build: . 
+    command: celery -A wheretf beat -l info
+    environment:
+      DEBUG: "${DEBUG}"
+      FORCE_SECURE: "${FORCE_SECURE}" 
+      SECRET_KEY: "${SECRET_KEY}"
+      SQL_DATABASE: "${SQL_DATABASE}"
+      SQL_USER: "${SQL_USER}"
+      SQL_PASSWORD: "${SQL_PASSWORD}"
+      SQL_HOST: "${SQL_HOST}"
+      TZ: "${TZ}"
+      CELERY_BROKER_URL: "amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/"
+    depends_on:
+      - database
+      - rabbitmq
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${SQL_PASSWORD}"
+      POSTGRES_USER: "${SQL_USER}"
+      POSTGRES_DB: "${SQL_DATABASE}"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - /custom/mount:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: 'rabbitmq:management'
+    restart: always
+    ports:
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+        
+volumes:
+  static: 
