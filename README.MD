@@ -26,7 +26,7 @@ Here is how to run in production with docker-compose. However I personally would
 ## API Endpoints
 BASE: `/api/v1`
 [OpenAPI JSON](docs/openapi.json)
-
+[Swagger](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/MaxwellDPS/Low-Orbit-Ipntel-Satellite/main/docs/openapi.json)
 ![swagger](docs/swagger.jpg)
 
 
