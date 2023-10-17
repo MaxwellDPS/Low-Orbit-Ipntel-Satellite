@@ -1,6 +1,7 @@
-# Low Orbit Intel Satellite!
+# Low Orbit I(p)ntel Satellite
 
-Introducing the low_orbit_intel_satellite! This app is a full Django, DRF, Celery, MySQL, and RabbitMQ Stack. This app features a functional paginated rest API, with full swagger documentation and an OpenAPI Schema.
+Opensouce API to run IP lookups for City, ASN, and Country
+
 
 # Dev Setup
 
@@ -23,3 +24,36 @@ Here is how to run in production with docker-compose. However I personally would
 
 
 ## API Endpoints
+BASE: `/api/v1`
+### Auth
+
+POST /auth/login/
+
+POST /auth/logout/
+
+POST /auth/logoutall/
+
+POST /auth/refresh/
+
+### Geo Sync
+GET /geo/sync
+
+POST /geo/sync
+
+GET /geo/sync/{request_uuid}
+
+DELETE /geo/sync/{request_uuid}
+
+### Lookup Request
+
+GET /lookup/
+
+POST /lookup/create
+
+GET /lookup/list
+
+GET /lookup/{request_uuid}/
+
+DELETE /lookup/{request_uuid}/
+
+GET /lookup/{request_uuid}/results
