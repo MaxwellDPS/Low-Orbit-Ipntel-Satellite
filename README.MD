@@ -25,6 +25,11 @@ Here is how to run in production with docker-compose. However I personally would
 
 ## API Endpoints
 BASE: `/api/v1`
+[OpenAPI JSON](docs/openapi.json)
+
+![swagger](docs/swagger.jpg)
+
+
 ### Auth
 
 POST /auth/login/
