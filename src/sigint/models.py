@@ -8,6 +8,7 @@
                 ||----w |
                 ||     ||
 """
+import logging
 import os
 from pathlib import Path
 import uuid
@@ -151,23 +152,33 @@ class GeoSync(models.Model):
         Archives files
         """
         for file_type in [self.asn_file, self.city_file, self.country_file]:
-            file_type: models.FileField
-            if not file_type:
-                continue
-            initial_path = Path(file_type.path)
-            initial_name = file_type.name
-            new_name = f"{self.time.isoformat()}_{self.uuid}_{initial_name}"
-            new_path = initial_path / "archived" / \
-                  {str(self.time.year)}  / {str(self.time.month)} / {str(self.time.day)} / new_name
-            new_path.mkdir(exist_ok=True, parents=True)
+            try:
+                file_type: models.FileField
+                if not file_type:
+                    continue
+                if "archived" in file_type.path:
+                    return None
+                initial_path = Path(file_type.path)
+                initial_name = file_type.name
+                new_name = f"{self.time.isoformat()}_{self.uuid}_{initial_name}"
+                new_path = initial_path / "archived" / \
+                    {str(self.time.year)}  / {str(self.time.month)} / {str(self.time.day)} / new_name
+                new_path.mkdir(exist_ok=True, parents=True)
 
-            os.rename(initial_path, new_path)
+                os.rename(initial_path, new_path)
 
-            file_type.path = new_path
-            file_type.name = new_name
+                file_type.path = new_path
+                file_type.name = new_name
 
-        self.latest = False
-        self.save()
+                try:
+                    os.remove(initial_path)
+                except:
+                    pass
+            except Exception as err:
+                logging.error(str(err))
+
+            self.latest = False
+            self.save()
 
     def recover(self) -> None:
         """

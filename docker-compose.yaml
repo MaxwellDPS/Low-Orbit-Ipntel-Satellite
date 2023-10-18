@@ -18,7 +18,7 @@ services:
     user: low_orbit_intel_satellite
     restart: always
     build: . 
-    command: "bash -c 'sleep 5; python ./manage.py showmigrations; python manage.py migrate; python manage.py createsuperuser --noinput; python manage.py collectstatic --no-input; gunicorn -c low_orbit_intel_satellite/gunicorn.conf.py'"
+    command: "bash -c 'sleep 5; python ./manage.py showmigrations; python manage.py migrate; python manage.py createsuperuser --noinput; python manage.py collectstatic --no-input; python manage.py create_geo_admin_group; gunicorn -c low_orbit_intel_satellite/gunicorn.conf.py'"
     networks:
       - lois
     environment:
@@ -38,6 +38,7 @@ services:
       DJANGO_SUPERUSER_EMAIL: "${DJANGO_SUPERUSER_EMAIL}"
     volumes:
       - geofiles:/opt/low_orbit_intel_satellite/geofiles
+      - static:/opt/low_orbit_intel_satellite/static
     depends_on:
       - database
       - rabbitmq

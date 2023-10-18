@@ -1,6 +1,5 @@
 """
-Djano Project peeps... 
-Feel free to steal and fix that shit so I dont have to think about this stupid again
+YES 👉
 """
 import logging
 import socket

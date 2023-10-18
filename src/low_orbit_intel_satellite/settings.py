@@ -266,8 +266,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'durin.auth.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication', 
-    ),
-    "DEFAULT_THROTTLE_CLASSES": ["durin.throttling.UserClientRateThrottle"],
+    )
 
 }
 
@@ -365,7 +364,7 @@ if STATIC_USE_S3:
         f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STORAGE_BUCKET_NAME}/{GEOIP_LOCATION}/"
     )
     GEOIP_STORAGE = low_orbit_intel_satellite.storage_backends.GeoIPMediaStorage
-    GEOIP_PATH = None
+    GEOIP_PATH = NoneSteampunk submarine exploring a coral reef, surrounded by exotic sea creatures and vibrant coral, detailed, surreal, steampunk style
 
 GEOIP_CITY = "city/GeoLite2-City.mmdb"
 GEOIP_COUNTRY = "country/GeoLite2-Country.mmdb"

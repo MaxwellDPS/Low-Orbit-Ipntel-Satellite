@@ -93,23 +93,20 @@ class AddressResultAdmin(admin.ModelAdmin):
     ordering = ('valid_from',)
     list_display = (
         'uuid',
-        'lookup',
         'ip_address',
         'bogon',
+        'country_name',
         'country_flag',
         'city_name',
         'region_name',
-        'country_name',
         'postal_code',
-        'latitude',
-        'longitude',
         'autonomous_system_number',
         'autonomous_system_organization',
         'valid_from',
         'valid_until',
     )
     search_fields = ('uuid', 'autonomous_system_organization', 'ip_address', 'city_name', 'region_name', 'country_name', 'autonomous_system_number', 'continent_code','region_code', 'country_code' )
-    list_filter = ('bogon', ValidListFilter, 'valid_from', 'matches_lists', 'country_european_union', 'continent_name' )
+    list_filter = ('bogon', ValidListFilter, 'valid_from', 'matches_lists', 'country_european_union', 'continent_name', 'country_name' )
 
     fieldsets = [
         (

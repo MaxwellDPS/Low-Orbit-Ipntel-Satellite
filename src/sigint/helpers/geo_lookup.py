@@ -53,7 +53,7 @@ class GeoCheck(object):
         else:
             try:
                 value = ip_address(address)
-                
+
                 self._results[value.compressed] = {
                     "valid": True,
                     "raw": address,

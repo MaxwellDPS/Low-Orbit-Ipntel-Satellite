@@ -109,8 +109,9 @@ class GeoUpdate(object):
             lastsync = None
             syncs =  GeoSync.objects.filter(time__gte=timezone.now() - timedelta(days=7))
             if syncs.exists():
-                lastsync = syncs[0]
-                lastsync.rollover()
+                for sync in syncs:
+                    sync.rollover()
+                    
                 
             for db_type, db_meta in self.max_mind_urls.items():
                 tar_data = self._pull_file(db_meta["url"])

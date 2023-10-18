@@ -31,6 +31,7 @@ SchemaView = get_schema_view(
 )
 
 urlpatterns = [
+   re_path(r'^/$', RedirectView.as_view(url='/api/v1', permanent=False)),
    re_path(r'^api/$', RedirectView.as_view(url='/api/v1', permanent=False)),
    re_path(r'^api/v1/$', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    path('api/v1/auth/login/', LoginView.as_view(), name='durin_login'),

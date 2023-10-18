@@ -6,6 +6,8 @@ import uuid
 from django.http import Http404
 from django.utils import timezone
 
+import durin.throttling
+
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -77,6 +79,7 @@ class Create(APIView, PaginationMixin):
     queryset = LookupRequest.objects.all()
     serializer_class = LookupRequestSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = [durin.throttling.UserClientRateThrottle]
 
     @swagger_auto_schema(
         tags=["Lookup Request"],
