@@ -4,6 +4,8 @@ YES 👉
 import logging
 import socket
 
+import geoip2.errors
+
 from pathlib import Path
 
 import geoip2.records
@@ -197,7 +199,10 @@ class GeoIP2:
         may be undefined (None).
         """
         enc_query = self._check_query(query, asn=True)
-        return ASN(self._asn.asn(enc_query))
+        try:
+            return ASN(self._asn.asn(enc_query))
+        except geoip2.errors.AddressNotFoundError as err:
+            return None
 
     def city(self, query) -> City:
         """

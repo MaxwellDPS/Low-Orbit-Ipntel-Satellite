@@ -126,8 +126,8 @@ class GeoCheck(object):
         address = AddressResult(
             lookup = lookup_request,
             ip_address = address.compressed,
-            autonomous_system_organization = asn.autonomous_system_organization,
-            autonomous_system_number = asn.autonomous_system_number,
+            autonomous_system_organization = asn.autonomous_system_organization if asn else None,
+            autonomous_system_number = asn.autonomous_system_number if asn else None,
             postal_code = city.postal_code.code,
             postal_confidence = city.postal_code.confidence,
             average_income = city.average_income,

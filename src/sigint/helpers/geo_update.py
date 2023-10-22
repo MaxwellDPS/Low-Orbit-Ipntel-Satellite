@@ -111,7 +111,6 @@ class GeoUpdate(object):
             if syncs.exists():
                 for sync in syncs:
                     sync.rollover()
-                    
                 
             for db_type, db_meta in self.max_mind_urls.items():
                 tar_data = self._pull_file(db_meta["url"])
@@ -123,7 +122,6 @@ class GeoUpdate(object):
                 self._validate_file(sha_256=sha_256, data=tar_data)
                 db_name = db_meta["name"]
                 data = self._untar(tar_data)
-                
 
                 if db_type == "asn":
                     self._tracker.asn_hash = sha_256
@@ -148,7 +146,9 @@ class GeoUpdate(object):
             self._tracker.error_info = f'[ERROR 🔥] {fire}\n\n{traceback.format_exc()}'
             self._tracker.save()
 
-            if lastsync:
-                lastsync.recover()
+            if syncs:
+                for sync in syncs:
+                    sync.recover()
+                    return None
 
         

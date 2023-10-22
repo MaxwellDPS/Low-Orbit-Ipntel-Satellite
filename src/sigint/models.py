@@ -41,6 +41,9 @@ def next_weekday(
         datetime.timedelta(days_ahead)
     return in_date + datetime.timedelta(days_ahead)
 
+def get_upload_path(instance, filename):
+    return f"/archived/{str(instance.time.year)}/{str(instance.time.month)}/{str(instance.time.day)}/{instance.uuid}/{filename}"
+
 class CIDRTagsList(models.Model):
     """
     Tracked CIDRs
@@ -126,11 +129,11 @@ class GeoSync(models.Model):
 
     STORAGE = getattr(settings,"GEOIP_STORAGE")
 
-    asn_file = models.FileField(upload_to="asn", \
+    asn_file = models.FileField(upload_to=get_upload_path, \
         null=True, blank=True, storage=STORAGE)
-    city_file = models.FileField(upload_to="city", \
+    city_file = models.FileField(upload_to=get_upload_path, \
         null=True, blank=True, storage=STORAGE)
-    country_file = models.FileField(upload_to="country", \
+    country_file = models.FileField(upload_to=get_upload_path, \
         null=True, blank=True, storage=STORAGE)
 
     @property
@@ -145,12 +148,15 @@ class GeoSync(models.Model):
         """
         Returns the experation
         """
-        return self.time > (timezone.now() - settings.GEO_SYNC_PRUNE_DAYS)
+        return self.time < (timezone.now() - settings.GEO_SYNC_PRUNE_DAYS)
+
+
 
     def rollover(self) -> None:
         """
         Archives files
         """
+
         for file_type in [self.asn_file, self.city_file, self.country_file]:
             try:
                 file_type: models.FileField
@@ -161,8 +167,9 @@ class GeoSync(models.Model):
                 initial_path = Path(file_type.path)
                 initial_name = file_type.name
                 new_name = f"{self.time.isoformat()}_{self.uuid}_{initial_name}"
-                new_path = initial_path / "archived" / \
-                    {str(self.time.year)}  / {str(self.time.month)} / {str(self.time.day)} / new_name
+                new_path = f"{str(initial_path.parent)}/archived/{str(self.time.year)}/{str(self.time.month)}/{str(self.time.day)}/{new_name}"
+                logging.error(new_path)
+                new_path = Path(new_path)
                 new_path.mkdir(exist_ok=True, parents=True)
 
                 os.rename(initial_path, new_path)

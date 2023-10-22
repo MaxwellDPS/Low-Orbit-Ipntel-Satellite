@@ -8,8 +8,11 @@
                 ||----w |
                 ||     ||
 """
+from datetime import timedelta
 import uuid
+from django.conf import settings
 
+from django.utils import timezone
 from django.contrib.auth.models import User
 from celery import shared_task
 from sigint.models import GeoSync, LookupRequest
@@ -22,7 +25,7 @@ def sync_maxmind_database(self, sync_uuid: uuid.UUID = None, force: bool = False
     """
     from sigint.helpers.geo_update import GeoUpdate
 
-    valid_syncs = GeoSync.objects.filter(expired=False)
+    valid_syncs = GeoSync.objects.filter(time__gte=(timezone.now() - settings.GEO_SYNC_PRUNE_DAYS))
     if valid_syncs and not force:
         # We gucci
         return None
